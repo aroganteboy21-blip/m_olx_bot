@@ -1,14 +1,18 @@
 import sys
 import subprocess
+import threading
 import os
 
+# Автоматическая установка библиотек
 try:
     import telebot
     from bs4 import BeautifulSoup
+    from flask import Flask
 except ImportError:
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "pyTelegramBotAPI", "requests", "beautifulsoup4"])
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "pyTelegramBotAPI", "requests", "beautifulsoup4", "flask"])
     import telebot
     from bs4 import BeautifulSoup
+    from flask import Flask
 
 import requests
 import time
@@ -17,10 +21,19 @@ TOKEN = '8796939526:AAHd7EU4yQDGOmxlWW8jSQlj-lxBUQrabnw'
 SCRAPER_API_KEY = 'a3601cb5e55392f1f78b0ae8095ad612'
 
 bot = telebot.TeleBot(TOKEN)
-
-# Ссылка на Киев от хозяев
 OLX_URL = "https://www.olx.ua/ru/nedvizhimost/kvartiry/dolgosrochnaya-arenda-kvartir/kiev/?search%5Bprivate_business%5D=private"
-PORT = int(os.environ.get("PORT", 8080))
+
+# Крошечный веб-сервер, который требует Render
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "Бот работает!"
+
+def run_flask():
+    # Заставляем Flask слушать порт 10000 (стандартный для Render)
+    app.run(host='0.0.0.0', port=10000)
+
 def get_latest_ads():
     try:
         payload = {'api_key': SCRAPER_API_KEY, 'url': OLX_URL}
@@ -60,5 +73,7 @@ def find_apartments(message):
         bot.send_message(message.chat.id, "❌ На OLX пока пусто по этому фильтру или обнови ссылку. Попробуй позже.")
 
 if __name__ == '__main__':
-    print("Бот успешно запущен на Render!")
+    # Запуск сервера для прохождения проверки портов Render
+    threading.Thread(target=run_flask).start()
+    print("Бот успешно запущен на Render Free!")
     bot.polling(none_stop=True)
