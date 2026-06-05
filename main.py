@@ -20,7 +20,7 @@ bot = telebot.TeleBot(TOKEN)
 
 # Ссылка на Киев от хозяев
 OLX_URL = "https://www.olx.ua/ru/nedvizhimost/kvartiry/dolgosrochnaya-arenda-kvartir/kiev/?search%5Bprivate_business%5D=private"
-
+PORT = int(os.environ.get("PORT", 8080))
 def get_latest_ads():
     try:
         payload = {'api_key': SCRAPER_API_KEY, 'url': OLX_URL}
